@@ -1,44 +1,40 @@
 const express = require('express');
 const axios = require('axios');
 const TelegramBot = require('node-telegram-bot-api');
-require('dotenv').config(); // بارگذاری متغیرهای محیطی از فایل .env
+require('dotenv').config();
 
-// دریافت توکن‌ها از متغیرهای محیطی
+// متغیرهای محیطی
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
-const MODEL_ENDPOINT = 'https://api-inference.huggingface.co/models/EleutherAI/gpt-j-6B'; // URL مدل Hugging Face
+const HUGGINGFACE_MODEL_URL = 'https://api-inference.huggingface.co/models/EleutherAI/gpt-j-6B'; // یا هر مدل دیگر
 
-// تنظیم بات تلگرام
+// راه‌اندازی ربات تلگرام
 const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
-
-// راه‌اندازی سرور Express
 const app = express();
 app.use(express.json());
 
-// تابعی برای تولید پاسخ از Hugging Face API
-async function generateResponse(message) {
+// تابع درخواست به مدل هوش مصنوعی Hugging Face
+async function getAIResponse(message) {
     try {
-        const response = await axios.post(MODEL_ENDPOINT, {
+        const response = await axios.post(HUGGINGFACE_MODEL_URL, {
             inputs: message,
         }, {
-            headers: { 'Authorization': `Bearer ${HUGGINGFACE_API_KEY}` }
+            headers: { Authorization: `Bearer ${HUGGINGFACE_API_KEY}` },
         });
-
-        // برگرداندن متن تولید شده
         return response.data[0].generated_text;
     } catch (error) {
-        console.error('Error with Hugging Face API:', error);
-        return "متاسفانه مشکلی در پردازش درخواست شما پیش آمد.";
+        console.error("Error with Hugging Face API:", error);
+        return "متاسفانه مشکلی پیش آمد، لطفاً دوباره تلاش کنید.";
     }
 }
 
-// مدیریت پیام‌های تلگرام
+// مدیریت پیام‌ها از تلگرام
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const userMessage = msg.text;
 
-    // دریافت پاسخ از مدل هوش مصنوعی
-    const aiResponse = await generateResponse(userMessage);
+    // گرفتن پاسخ از مدل هوش مصنوعی
+    const aiResponse = await getAIResponse(userMessage);
 
     // ارسال پاسخ به کاربر
     bot.sendMessage(chatId, aiResponse);
