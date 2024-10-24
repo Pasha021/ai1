@@ -1,15 +1,15 @@
 {
-  "name": "ai-telegram-bot",
+  "name": "persian-ai-telegram-bot",
   "version": "1.0.0",
-  "description": "A Telegram AI chatbot that supports Persian language using GPT-J",
+  "description": "AI-powered Telegram bot in Persian language",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "axios": "^0.21.4",
-    "dotenv": "^10.0.0",
-    "express": "^4.21.1",
-    "node-telegram-bot-api": "^0.54.0"
+    "axios": "^0.21.1",
+    "express": "^4.17.1",
+    "node-telegram-bot-api": "^0.54.0",
+    "dotenv": "^10.0.0"
   }
 }
